@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seller Dashboard - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='seller_dashboard.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <p class="navbar-brand">PetHouse</p>
+      </div>
+      <div class="navbar-right">
+        <a href="/dashboard/seller/profile">Profile</a>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Seller Form -->
+  <div class="dashboard-wrapper">
+    <div class="dashboard-content">
+      <h2>Post a Pet for Sale or Adoption</h2>
+
+      <form id="petForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Pet Name</label>
+          <input type="text" name="name" required />
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" required />
+        </div>
+
+        <div class="form-group">
+          <label>Price (৳)</label>
+          <input type="number" name="price" required />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status" required>
+            <option value="For Sale">For Sale</option>
+            <option value="Adoption">Adoption</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" required />
+        </div>
+
+        <div class="form-group">
+          <label>Upload Pet Images</label>
+          <input type="file" name="images" multiple accept="image/*" onchange="previewImages(event)" />
+        </div>
+
+        <div class="image-preview" id="imagePreview"></div>
+
+        <button type="submit">Post Pet</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+
+    function previewImages(event) {
+      const files = event.target.files;
+      const preview = document.getElementById("imagePreview");
+      preview.innerHTML = "";
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("petForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      alert("Pet post submitted! (not yet connected to backend)");
+    });
+  </script>
+
+</body>
+</html>

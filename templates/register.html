@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+</head>
+<body>
+
+  <!-- Minimal Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <a href="{{ url_for('homepage') }}" class="navbar-brand">PetHouse</a>
+      </div>
+      <div class="navbar-right">
+        <a href="{{ url_for('homepage') }}">Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Register Form -->
+  <div class="register-container">
+    <div class="register-box">
+      <h2>Register to PetHouse</h2>
+      <form id="register-form">
+        <label>Full Name</label>
+        <input
+          type="text"
+          name="name"
+          required
+          placeholder="Your full name"
+        />
+
+        <label>Email Address</label>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="example@domain.com"
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          required
+          placeholder="Enter password"
+        />
+
+        <label>Register as</label>
+        <select name="role">
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+          <option value="vet">Vet</option>
+        </select>
+
+        <button type="submit">Create Account</button>
+      </form>
+
+      <p>
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login here</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById("register-form");
+
+    registerForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(registerForm);
+      const values = Object.fromEntries(formData.entries());
+      console.log("Register submitted:", values);
+
+      // You can send this to a Flask backend if needed
+      window.location.href = "/";
+    });
+  </script>
+
+</body>
+</html>

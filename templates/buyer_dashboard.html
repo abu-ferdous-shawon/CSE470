@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Buyer Dashboard - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='buyer_dashboard.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <p class="navbar-brand">PetHouse</p>
+    </div>
+    <div class="navbar-right">
+      <a href="/dashboard/buyer/profile">Profile</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- Dashboard Content -->
+  <div class="dashboard-wrapper">
+    <div class="dashboard-content">
+      <h2>Search for your desired pets</h2>
+
+      <div class="filters">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name, category, or location..."
+          oninput="filterPets()"
+        />
+      </div>
+
+      <div class="pet-list" id="petList"></div>
+
+      <h2 class="purchase-history-title">Purchase History</h2>
+      <div class="purchase-history" id="purchaseHistory"></div>
+    </div>
+  </div>
+
+  <script>
+    const petsData = [
+      {
+        id: 1,
+        name: "Golden Retriever",
+        category: "Dog",
+        location: "Dhaka",
+        price: 300,
+        status: "For Sale",
+        phone: "0123456789",
+        images: ["https://placedog.net/400/300?id=1", "https://placedog.net/400/300?id=2"]
+      },
+      {
+        id: 2,
+        name: "Persian Cat",
+        category: "Cat",
+        location: "Chittagong",
+        price: 200,
+        status: "Adoption",
+        phone: "0987654321",
+        images: ["https://placekitten.com/400/300", "https://placekitten.com/401/300"]
+      }
+    ];
+
+    const purchaseHistory = [
+      {
+        id: 101,
+        name: "Golden Retriever",
+        price: 300,
+        date: "2025-06-15",
+        location: "Dhaka",
+        category: "Dog",
+        phone: "0123456789",
+        status: "For Sale",
+        images: ["https://placedog.net/400/300?id=1"]
+      },
+      {
+        id: 102,
+        name: "Persian Cat",
+        price: 200,
+        date: "2025-06-20",
+        location: "Chittagong",
+        category: "Cat",
+        phone: "0987654321",
+        status: "Adoption",
+        images: ["https://placekitten.com/400/300"]
+      }
+    ];
+
+    const petListDiv = document.getElementById("petList");
+    const historyDiv = document.getElementById("purchaseHistory");
+
+    function renderPets(pets) {
+      petListDiv.innerHTML = "";
+      pets.forEach(pet => {
+        const div = document.createElement("div");
+        div.className = "pet-card";
+        div.innerHTML = `
+          <div class="pet-images">
+            ${pet.images.map(img => `<img src="${img}" alt="${pet.name}" />`).join("")}
+          </div>
+          <h3>${pet.name}</h3>
+          <p>Category: ${pet.category}</p>
+          <p>Location: ${pet.location}</p>
+          <p>Price: ৳${pet.price}</p>
+          <p>Status: ${pet.status}</p>
+          <p>Contact: ${pet.phone}</p>
+          <button>Buy Now</button>
+          <button class="chat-btn">💬 Live Chat</button>
+        `;
+        petListDiv.appendChild(div);
+      });
+    }
+
+    function renderPurchaseHistory() {
+      historyDiv.innerHTML = "";
+      purchaseHistory.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "purchase-history-card";
+        div.innerHTML = `
+          <div class="pet-images">
+            ${item.images.map(img => `<img src="${img}" alt="${item.name}" />`).join("")}
+          </div>
+          <p>Name: ${item.name}</p>
+          <p>Price: ৳${item.price}</p>
+          <p>Date: ${item.date}</p>
+          <p>Category: ${item.category}</p>
+          <p>Location: ${item.location}</p>
+          <p>Contact: ${item.phone}</p>
+          <p>Status: ${item.status}</p>
+        `;
+        historyDiv.appendChild(div);
+      });
+    }
+
+    function filterPets() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = petsData.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query) ||
+        p.location.toLowerCase().includes(query)
+      );
+      renderPets(filtered);
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+
+    // Initial rendering
+    renderPets(petsData);
+    renderPurchaseHistory();
+  </script>
+</body>
+</html>

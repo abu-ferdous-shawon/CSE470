@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Navbar</title>
+  <link rel="stylesheet" href="navbar.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <a href="/" class="navbar-brand">PetHouse</a>
+      </div>
+      <div class="navbar-right">
+        <a href="/">Home</a>
+
+        <div class="about-dropdown-container" id="about-container">
+          <button class="about-link" id="about-btn">About Us</button>
+          <div class="about-dropdown-box" id="about-dropdown">
+            <h4>Why PetHouse?</h4>
+            <ul>
+              <li>1. Adopt pets from trusted owners</li>
+              <li>2. Buy and sell pets securely</li>
+              <li>3. Book appointments with certified veterinarians</li>
+              <li>4. Get pet food and accessories delivered to your door</li>
+              <li>5. Track your orders and view purchase history</li>
+            </ul>
+          </div>
+        </div>
+
+        <button class="logout-button" id="logout-btn">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    const dropdownBox = document.getElementById("about-dropdown");
+    const dropdownBtn = document.getElementById("about-btn");
+    const dropdownContainer = document.getElementById("about-container");
+    const logoutBtn = document.getElementById("logout-btn");
+
+    let showDropdown = false;
+
+    dropdownBtn.addEventListener("click", () => {
+      showDropdown = !showDropdown;
+      dropdownBox.style.display = showDropdown ? "block" : "none";
+    });
+
+    document.addEventListener("mousedown", (e) => {
+      if (!dropdownContainer.contains(e.target)) {
+        dropdownBox.style.display = "none";
+        showDropdown = false;
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("user");
+      window.location.href = "/";
+    });
+  </script>
+
+</body>
+</html>

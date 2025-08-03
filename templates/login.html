@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+
+  <!-- Minimal Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <a href="/" class="navbar-brand">PetHouse</a>
+      </div>
+      <div class="navbar-right">
+        <a href="{{ url_for('homepage') }}">Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login Form -->
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Login to PetHouse</h2>
+      <form id="login-form">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        />
+
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        />
+
+        <label>Login as</label>
+        <select name="role" required>
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+          <option value="vet">Vet</option>
+          <option value="admin">Admin</option>
+        </select>
+
+        <button type="submit">Login</button>
+      </form>
+      <p>
+        Don't have an account?
+        <a href="{{ url_for('register') }}">Register here</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const role = formData.get("role");
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: "Test User", role: role })
+      );
+      console.log("Logging in as:", role);
+      window.location.href = `/dashboard/${role}`;
+    });
+  </script>
+
+</body>
+</html>

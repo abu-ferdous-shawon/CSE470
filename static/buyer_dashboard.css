@@ -1,4 +1,4 @@
-/* Wrapper Styling */
+
 .dashboard-wrapper {
   font-family: Arial, sans-serif;
   background: rgb(255, 255, 255);
@@ -7,7 +7,6 @@
   padding-bottom: 50px;
 }
 
-/* Sticky Navbar */
 .navbar {
     background-color: #222;
     color: white;
@@ -47,7 +46,6 @@
 }
 
 
-/* Dashboard Content Wrapper */
 .dashboard-content {
   max-width: 1200px;
   margin: 20px auto;
@@ -56,7 +54,7 @@
   border-radius: 10px;
 }
 
-/* Unified Search Bar */
+
 .filters {
   display: flex;
   margin-bottom: 20px;
@@ -71,23 +69,23 @@
   border: 1px solid #ccc;
 }
 
-/* Pet Listings Grid */
+
 .pet-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* narrower cards */
-  gap: 16px; /* smaller spacing */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+  gap: 16px; 
 }
 
-/* Pet Card with Hover Animation */
+
 .pet-card {
   background: #888eaf;
-  padding: 10px; /* reduced from 15px */
+  padding: 10px; 
   border-radius: 6px;
   color: white;
-  font-size: 0.9rem; /* slightly smaller text */
+  font-size: 0.9rem; 
   display: flex;
   flex-direction: column;
-  gap: 6px; /* space between elements */
+  gap: 6px; 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
@@ -108,7 +106,7 @@
   border: none;
   cursor: pointer;
   border-radius: 4px;
-  font-size: 0.8rem; /* was 0.9rem */
+  font-size: 0.8rem; 
 }
 
 .pet-card button:first-child {
@@ -141,14 +139,14 @@
 
 .pet-card img {
   width: 100%;
-  height: 120px; /* reduced from 180px */
+  height: 120px; 
   object-fit: cover;
   border-radius: 4px;
   margin-bottom: 4px;
 }
 
 
-/* Purchase History Section */
+
 .purchase-history-title {
   font-size: 1.6rem;
   font-weight: bold;
@@ -160,8 +158,8 @@
 
 .purchase-history {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* narrower card width */
-  gap: 16px; /* tighter gap */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+  gap: 16px; 
   margin-top: 20px;
   max-width: 1200px;
   margin-left: auto;
@@ -172,20 +170,20 @@
 
 .purchase-history-card {
   background: #888eaf;
-  padding: 10px; /* reduced from 15px */
-  border-radius: 6px; /* was 8px */
+  padding: 10px;
+  border-radius: 6px;
   color: white;
-  font-size: 0.9rem; /* compact font size */
+  font-size: 0.9rem; 
   display: flex;
   flex-direction: column;
-  gap: 6px; /* spacing between elements */
+  gap: 6px; 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .purchase-history-card img {
   width: 100%;
-  height: 120px; /* was 180px */
+  height: 120px; 
   object-fit: cover;
   border-radius: 4px;
   margin-bottom: 4px;

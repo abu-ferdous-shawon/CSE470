@@ -72,7 +72,7 @@
 
 .pet-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* narrower cards */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
   gap: 16px; 
 }
 
@@ -158,7 +158,7 @@
 
 .purchase-history {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* narrower card width */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
   gap: 16px; 
   margin-top: 20px;
   max-width: 1200px;

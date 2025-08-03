@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- Minimal Navbar -->
   <nav class="navbar">
     <div class="navbar-content">
       <div class="navbar-left">
@@ -20,7 +19,7 @@
     </div>
   </nav>
 
-  <!-- Register Form -->
+ 
   <div class="register-container">
     <div class="register-box">
       <h2>Register to PetHouse</h2>
@@ -75,7 +74,6 @@
       const values = Object.fromEntries(formData.entries());
       console.log("Register submitted:", values);
 
-      // You can send this to a Flask backend if needed
       window.location.href = "/";
     });
   </script>

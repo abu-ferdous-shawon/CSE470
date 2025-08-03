@@ -3,10 +3,10 @@ html, body {
   padding: 0;
   font-family: sans-serif;
   height: 100%;
-  background: black; /* fallback background */
+  background: black; 
 }
 
-/* Home Container Fullscreen */
+
 .home-container {
   background-image: url('https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg');
   background-size: cover;
@@ -24,7 +24,7 @@ html, body {
   text-align: center;
 }
 
-/* Overlay */
+
 .home-container::before {
   content: "";
   position: absolute;
@@ -35,13 +35,13 @@ html, body {
   z-index: -1;
 }
 
-/* Content on top of overlay */
+
 .home-container > * {
   position: relative;
   z-index: 1;
 }
 
-/* Hero section */
+
 .home-hero h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
@@ -52,7 +52,7 @@ html, body {
   margin-bottom: 2rem;
 }
 
-/* Buttons */
+
 .home-buttons {
   display: flex;
   gap: 1rem;
@@ -88,10 +88,10 @@ html, body {
   color: white;
 }
 
-/* Footer */
+
 .home-footer {
   margin-top: auto;
   font-size: 0.9rem;
-  color: white; /* was too dark before */
+  color: white; 
   padding-top: 2rem;
 }

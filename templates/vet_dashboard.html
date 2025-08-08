@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vet Dashboard - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='vet_dashboard.css') }}" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <p class="navbar-brand">PetHouse</p>
+    </div>
+    <div class="navbar-right">
+      <a href="/dashboard/seller/profile">Profile</a>
+      <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-wrapper">
+  <div class="dashboard-content">
+    <h2>All Appointments</h2>
+    {% if appointments %}
+    <table class="appointment-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Owner</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Accept</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td>{{ appt.id }}</td>
+          <td>{{ appt.name }}</td>
+          <td>{{ appt.email }}</td>
+          <td>{{ appt.phone_number }}</td>
+          <td>{{ appt.date }}</td>
+          <td>{{ appt.status }}</td>
+          <td>
+            {% if appt.status != 'Accepted' %}
+            <form method="POST" action="{{ url_for('accept_appointment') }}">
+              <input type="hidden" name="appointment_id" value="{{ appt.id }}">
+              <button type="submit" class="accept-btn">Accept</button>
+            </form>
+            {% else %}
+            <span class="accepted">Accepted</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p>No appointments found.</p>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>

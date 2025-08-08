@@ -1,40 +1,38 @@
-.dashboard-wrapper {
-  font-family: Arial, sans-serif;
-  background: #f3f4f6;
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url("https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg") no-repeat center center fixed;
+  background-size: cover;
   min-height: 100vh;
+}
+
+
+.dashboard-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding-top: 80px; 
-}
-
-.navbar {
-    background-color: #222;
-    color: white;
-    padding: 5px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1rem;
+  padding-top: 100px; 
+  padding-bottom: 60px;
 }
 
 
-.seller-form {
-  background-color: white;
+.dashboard-content {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   padding: 2rem 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 600px;
-  margin-top: 40px;
 }
 
-.seller-form h2 {
+
+.dashboard-content h2 {
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
   color: #111827;
 }
+
 
 .form-group {
   margin-bottom: 1rem;
@@ -77,4 +75,35 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
   background-color: #333;
+}
+
+.flashes {
+  list-style: none;
+  padding: 10px;
+  margin: 100px auto 20px;
+  max-width: 600px;
+}
+
+.flash.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.flash.danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.image-preview img {
+  max-width: 150px;
+  margin: 5px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }

@@ -70,3 +70,14 @@ html, body {
   text-align: center;
   margin-top: 1rem;
 }
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+.flash.success {
+  color: green;
+}
+.flash.danger {
+  color: red;
+}

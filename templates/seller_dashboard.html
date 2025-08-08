@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Seller Dashboard - PetHouse</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='seller_dashboard.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='seller_dashboard.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -17,16 +16,35 @@
       </div>
       <div class="navbar-right">
         <a href="/dashboard/seller/profile">Profile</a>
-        <button onclick="logout()">Logout</button>
+        <a href="{{ url_for('available_vets') }}">Vet</a>
+        <a href="{{ url_for('view_appointments') }}">Appointments</a>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
       </div>
     </div>
   </nav>
+
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
 
   <div class="dashboard-wrapper">
     <div class="dashboard-content">
       <h2>Post a Pet for Sale or Adoption</h2>
 
-      <form id="petForm" enctype="multipart/form-data">
+      <form
+        id="petForm"
+        method="POST"
+        action="{{ url_for('post_pet') }}"
+        enctype="multipart/form-data"
+      >
         <div class="form-group">
           <label>Pet Name</label>
           <input type="text" name="name" required />
@@ -38,8 +56,13 @@
         </div>
 
         <div class="form-group">
+          <label>Category</label>
+          <input type="text" name="category" required />
+        </div>
+
+        <div class="form-group">
           <label>Price (৳)</label>
-          <input type="number" name="price" required />
+          <input type="number" name="price" step="0.01" required />
         </div>
 
         <div class="form-group">
@@ -68,11 +91,6 @@
   </div>
 
   <script>
-    function logout() {
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-    }
-
     function previewImages(event) {
       const files = event.target.files;
       const preview = document.getElementById("imagePreview");
@@ -83,16 +101,13 @@
         reader.onload = e => {
           const img = document.createElement("img");
           img.src = e.target.result;
+          img.style.maxWidth = "150px";
+          img.style.margin = "5px";
           preview.appendChild(img);
         };
         reader.readAsDataURL(file);
       });
     }
-
-    document.getElementById("petForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      alert("Pet post submitted! (not yet connected to backend)");
-    });
   </script>
 
 </body>

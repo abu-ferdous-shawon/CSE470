@@ -19,11 +19,21 @@
     </div>
   </nav>
 
- 
   <div class="register-container">
     <div class="register-box">
       <h2>Register to PetHouse</h2>
-      <form id="register-form">
+
+      {%- with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash {{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {%- endwith %}
+
+      <form id="register-form" method="POST" action="{{ url_for('register') }}">
         <label>Full Name</label>
         <input
           type="text"
@@ -47,36 +57,47 @@
           required
           placeholder="Enter password"
         />
+        <label>Phone number</label>
+        <input
+          type="tel"
+          name="phone"
+          required
+          placeholder="01922318828"
+        />
 
         <label>Register as</label>
-        <select name="role">
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-          <option value="vet">Vet</option>
-        </select>
-
+          <select name="role" id="roleSelect" onchange="toggleVetFields()">
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+            <option value="vet">Vet</option>
+          </select>
+          <div id="vetFields" style="display: none; margin-top: 10px;">
+            <label>Location</label>
+            <input type="text" name="location" placeholder="Your location" />
+            <label>speciality</label>
+            <input type="text" name="speciality" placeholder="Enter Your speciality" />
+          </div>
         <button type="submit">Create Account</button>
       </form>
+      <script>
+        function toggleVetFields() {
+          const role = document.getElementById("roleSelect").value;
+          const vetFields = document.getElementById("vetFields");
+          if (role === "vet") {
+            vetFields.style.display = "block";
+          } else {
+            vetFields.style.display = "none";
+          }
+        }
 
+        window.onload = toggleVetFields;
+      </script>
       <p>
         Already have an account?
         <a href="{{ url_for('login') }}">Login here</a>
       </p>
     </div>
   </div>
-
-  <script>
-    const registerForm = document.getElementById("register-form");
-
-    registerForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const formData = new FormData(registerForm);
-      const values = Object.fromEntries(formData.entries());
-      console.log("Register submitted:", values);
-
-      window.location.href = "/";
-    });
-  </script>
 
 </body>
 </html>

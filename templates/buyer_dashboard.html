@@ -8,151 +8,108 @@
 </head>
 <body>
 
-
-<nav class="navbar">
-  <div class="navbar-content">
-    <div class="navbar-left">
-      <p class="navbar-brand">PetHouse</p>
-    </div>
-    <div class="navbar-right">
-      <a href="/dashboard/buyer/profile">Profile</a>
-      <button onclick="logout()">Logout</button>
-    </div>
-  </div>
-</nav>
-
-
-  <div class="dashboard-wrapper">
-    <div class="dashboard-content">
-      <h2>Search for your desired pets</h2>
-
-      <div class="filters">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search by name, category, or location..."
-          oninput="filterPets()"
-        />
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <p class="navbar-brand">PetHouse</p>
       </div>
-
-      <div class="pet-list" id="petList"></div>
-
-      <h2 class="purchase-history-title">Purchase History</h2>
-      <div class="purchase-history" id="purchaseHistory"></div>
+      <div class="navbar-right">
+        <a href="/dashboard/buyer/profile">Profile</a>
+        <a href="{{ url_for('available_vets') }}">Vet</a>
+        <a href="{{ url_for('view_appointments') }}">Appointments</a>
+        <button onclick="logout()">Logout</button>
+      </div>
     </div>
-  </div>
+  </nav>
 
-  <script>
-    const petsData = [
-      {
-        id: 1,
-        name: "Golden Retriever",
-        category: "Dog",
-        location: "Dhaka",
-        price: 300,
-        status: "For Sale",
-        phone: "0123456789",
-        images: ["https://placedog.net/400/300?id=1", "https://placedog.net/400/300?id=2"]
-      },
-      {
-        id: 2,
-        name: "Persian Cat",
-        category: "Cat",
-        location: "Chittagong",
-        price: 200,
-        status: "Adoption",
-        phone: "0987654321",
-        images: ["https://placekitten.com/400/300", "https://placekitten.com/401/300"]
-      }
-    ];
+<div class="dashboard-wrapper">
+  <div class="dashboard-content">
+    <h2>Search for your desired pets</h2>
 
-    const purchaseHistory = [
-      {
-        id: 101,
-        name: "Golden Retriever",
-        price: 300,
-        date: "2025-06-15",
-        location: "Dhaka",
-        category: "Dog",
-        phone: "0123456789",
-        status: "For Sale",
-        images: ["https://placedog.net/400/300?id=1"]
-      },
-      {
-        id: 102,
-        name: "Persian Cat",
-        price: 200,
-        date: "2025-06-20",
-        location: "Chittagong",
-        category: "Cat",
-        phone: "0987654321",
-        status: "Adoption",
-        images: ["https://placekitten.com/400/300"]
-      }
-    ];
+    <div class="filters">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by name, category, or location..."
+        oninput="filterPets()"
+      />
+    </div>
 
-    const petListDiv = document.getElementById("petList");
-    const historyDiv = document.getElementById("purchaseHistory");
-
-    function renderPets(pets) {
-      petListDiv.innerHTML = "";
-      pets.forEach(pet => {
-        const div = document.createElement("div");
-        div.className = "pet-card";
-        div.innerHTML = `
+    <div class="pet-list" id="petList">
+      {% for pet in pets %}
+        <div class="pet-card">
           <div class="pet-images">
-            ${pet.images.map(img => `<img src="${img}" alt="${pet.name}" />`).join("")}
+            {% for img_url in pet.image_urls %}
+              <img src="{{ img_url }}" alt="{{ pet.name }}" onerror="this.onerror=null; this.src='/static/default_pet.png';" />
+            {% endfor %}
           </div>
-          <h3>${pet.name}</h3>
-          <p>Category: ${pet.category}</p>
-          <p>Location: ${pet.location}</p>
-          <p>Price: ৳${pet.price}</p>
-          <p>Status: ${pet.status}</p>
-          <p>Contact: ${pet.phone}</p>
+          <h3>{{ pet.name }}</h3>
+          <p>Category: {{ pet.category }}</p>
+          <p>Location: {{ pet.location }}</p>
+          <p>Price: ৳{{ pet.price }}</p>
+          <p>Status: {{ pet.status }}</p>
+          <p>Contact: {{ pet.phone }}</p>
           <button>Buy Now</button>
           <button class="chat-btn">💬 Live Chat</button>
-        `;
-        petListDiv.appendChild(div);
-      });
-    }
+        </div>
+      {% else %}
+        <p>No pets available right now.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
 
-    function renderPurchaseHistory() {
-      historyDiv.innerHTML = "";
-      purchaseHistory.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "purchase-history-card";
-        div.innerHTML = `
-          <div class="pet-images">
-            ${item.images.map(img => `<img src="${img}" alt="${item.name}" />`).join("")}
-          </div>
-          <p>Name: ${item.name}</p>
-          <p>Price: ৳${item.price}</p>
-          <p>Date: ${item.date}</p>
-          <p>Category: ${item.category}</p>
-          <p>Location: ${item.location}</p>
-          <p>Contact: ${item.phone}</p>
-          <p>Status: ${item.status}</p>
-        `;
-        historyDiv.appendChild(div);
-      });
-    }
+<div id="imgModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImg" />
+  <div id="caption"></div>
+</div>
 
-    function filterPets() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = petsData.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query) ||
-        p.location.toLowerCase().includes(query)
-      );
-      renderPets(filtered);
-    }
+<script>
+  function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
 
-    function logout() {
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+  function filterPets() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const petCards = document.querySelectorAll(".pet-card");
+
+    petCards.forEach(card => {
+      const name = card.querySelector("h3").textContent.toLowerCase();
+      const category = card.querySelector("p:nth-child(3)").textContent.toLowerCase();
+      const location = card.querySelector("p:nth-child(4)").textContent.toLowerCase();
+
+      if (name.includes(query) || category.includes(query) || location.includes(query)) {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+    const modal = document.getElementById("imgModal");
+  const modalImg = document.getElementById("modalImg");
+  const captionText = document.getElementById("caption");
+  const closeBtn = document.getElementsByClassName("close")[0];
+
+  document.querySelectorAll(".pet-images img").forEach(img => {
+    img.addEventListener("click", () => {
+      modal.style.display = "block";
+      modalImg.src = img.src;
+      captionText.innerText = img.alt || "";
+    });
+  });
+
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
     }
-    renderPets(petsData);
-    renderPurchaseHistory();
-  </script>
+  };
+</script>
+
 </body>
 </html>

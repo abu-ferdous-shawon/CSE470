@@ -14,7 +14,9 @@
         <p class="navbar-brand">PetHouse</p>
       </div>
       <div class="navbar-right">
-        <a href="/dashboard/buyer/profile">Profile</a>
+        <a href="{{ url_for('orders') }}">Purchase History</a>
+        <a href="{{ url_for('show_wishlist') }}">Wishlist</a>
+        <a href="{{ url_for('profile_update') }}">Profile</a>
         <a href="{{ url_for('available_vets') }}">Vet</a>
         <a href="{{ url_for('view_appointments') }}">Appointments</a>
         <button onclick="logout()">Logout</button>
@@ -49,8 +51,15 @@
           <p>Price: ৳{{ pet.price }}</p>
           <p>Status: {{ pet.status }}</p>
           <p>Contact: {{ pet.phone }}</p>
-          <button>Buy Now</button>
+          <form method="POST" action="{{ url_for('buy_pet', pet_id=pet.id) }}">
+            <button type="submit" class="buy-btn">Buy Now</button>
+          </form>
+
           <button class="chat-btn">💬 Live Chat</button>
+            <form method="POST" action="{{ url_for('add_to_wishlist') }}">
+              <input type="hidden" name="pet_id" value="{{ pet.id }}">
+              <button type="submit" class="wishlist-btn">Add to Wishlist</button>
+            </form>
         </div>
       {% else %}
         <p>No pets available right now.</p>

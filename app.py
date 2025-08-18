@@ -3,7 +3,8 @@ import os
 from werkzeug.utils import secure_filename
 import pymysql.cursors
 from flask import send_from_directory
-import datetime
+from datetime import datetime
+
 
 
 
@@ -137,7 +138,7 @@ def logout():
 def buyer_dashboard():
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT name, category, location, price, status, phone_number, image FROM pets")
+    cursor.execute("SELECT id, name, category, location, price, status, phone_number, image FROM pets WHERE is_approved = 'approved' AND status != 'sold'")
     pets_data = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -258,9 +259,8 @@ def appoint_doctor():
     user_id = session['user_id']
     vet_id = request.form.get('vet_id')
     status = "pending"
-    date = datetime.date.today()
-    print("DEBUG: vet_id =", vet_id)
-    print("DEBUG: user_id =", user_id)
+    date = datetime.now()
+
 
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -340,6 +340,251 @@ def view_appointments():
         connection.close()
 
     return render_template("view_appointments.html", appointments=appointments)
+
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    if "role" not in session or session["role"] != "admin":
+        flash("Unauthorized access", "danger")
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+    try:
+        cursor.execute("""
+            SELECT id, name, category, location, price, status, is_approved, phone_number, image 
+            FROM pets
+            WHERE is_approved = 'pending'
+        """)
+        pets = cursor.fetchall()
+    finally:
+        cursor.close()
+        connection.close()
+
+    return render_template("admin_dashboard.html", pets=pets)
+
+
+@app.route("/admin/approve_pet/<int:pet_id>", methods=["POST"])
+def approve_pet(pet_id):
+    if "role" not in session or session["role"] != "admin":
+        flash("Unauthorized access", "danger")
+        return redirect(url_for("login"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE pets
+            SET is_approved = 'approved'
+            WHERE id = %s
+        """, (pet_id,))
+        connection.commit()
+        flash("Pet approved successfully!", "success")
+    finally:
+        cursor.close()
+        connection.close()
+
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route('/profile_update', methods=['GET', 'POST'])
+def profile_update():
+    connection = get_db_connection()
+    cursor = connection.cursor(pymysql.cursors.DictCursor)
+
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You must be logged in to update profile.", "danger")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        name = request.form['name']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
+        password = request.form['password']
+        file = request.files.get('profile_pic')
+
+        profile_pic_filename = None
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            profile_pic_filename = filename
+
+        try:
+            if profile_pic_filename:
+                cursor.execute(
+                    "UPDATE users SET name=%s, phone_number=%s, email=%s, password=%s, profile_pic=%s WHERE id=%s",
+                    (name, phone_number, email, password, profile_pic_filename, user_id)
+                )
+            else:
+                cursor.execute(
+                    "UPDATE users SET name=%s, phone_number=%s, email=%s, password=%s WHERE id=%s",
+                    (name, phone_number, email, password, user_id)
+                )
+            connection.commit()
+            flash("Profile updated successfully!", "success")
+        except Exception as e:
+            connection.rollback()
+            flash(f"Error updating profile: {str(e)}", "danger")
+
+    cursor.execute("SELECT * FROM users WHERE id=%s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    return render_template('profile_update.html', user=user)
+
+
+@app.route('/add_to_wishlist', methods=['POST'])
+def add_to_wishlist():
+    if 'user_id' not in session:
+        flash("You must be logged in to add to wishlist.", "danger")
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    pet_id = request.form.get('pet_id')
+
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO wishlist (user_id, pet_id) VALUES (%s, %s)",
+            (user_id, pet_id)
+        )
+        connection.commit()
+        flash("Added to wishlist!", "success")
+    except Exception as e:
+        connection.rollback()
+        flash(f"Error adding to wishlist: {str(e)}", "danger")
+    finally:
+        cursor.close()
+        connection.close()
+
+    return redirect(url_for('buyer_dashboard'))
+
+@app.route("/wishlist")
+def show_wishlist():
+    if 'user_id' not in session:
+        flash("Please log in to view your wishlist.", "error")
+        return redirect(url_for("login"))
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("""
+        SELECT p.id, p.name, p.category, p.location, p.price, p.status, p.phone_number, p.image
+        FROM pets p
+        JOIN wishlist w ON p.id = w.pet_id
+        WHERE w.user_id = %s
+    """, (user_id,))
+    
+    pets = cursor.fetchall()
+
+    # Convert images string to list if stored as comma-separated
+    for pet in pets:
+        pet['image_urls'] = pet['image'].split(',') if pet['image'] else []
+
+    cursor.close()
+    conn.close()
+
+    return render_template("show_wishlist.html", pets=pets)
+
+
+@app.route("/remove_wishlist/<int:pet_id>", methods=["POST"])
+def remove_wishlist(pet_id):
+    if 'user_id' not in session:
+        flash("Please log in first.", "error")
+        return redirect(url_for("login"))
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM wishlist WHERE user_id = %s AND pet_id = %s", (user_id, pet_id))
+        conn.commit()
+        flash("Pet removed from your wishlist.", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error removing from wishlist: {str(e)}", "error")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("show_wishlist"))
+
+
+
+@app.route("/buy_pet/<int:pet_id>", methods=["POST"])
+def buy_pet(pet_id):
+    if 'user_id' not in session:
+        flash("Please log in to buy a pet.", "error")
+        return redirect(url_for("login"))
+
+    user_id = session['user_id']
+    status = "sold"
+    purchase_time = datetime.now()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE pets SET status = %s WHERE id = %s AND status != 'sold'", (status, pet_id))
+        if cursor.rowcount == 0:
+            flash("This pet is already sold.", "error")
+        else:
+            cursor.execute(
+                "INSERT INTO orders (buyer_id, pet_id, status, time) VALUES (%s, %s, %s, %s)",
+                (user_id, pet_id, status, purchase_time)
+            )
+            conn.commit()
+            flash("Purchase successful!", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error buying pet: {str(e)}", "error")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("buyer_dashboard"))
+
+
+@app.route("/orders")
+def orders():
+    if 'user_id' not in session:
+        flash("Please log in to view your orders.", "error")
+        return redirect(url_for("login"))
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    try:
+        cursor.execute("""
+            SELECT o.id AS order_id, o.status AS order_status, o.time,
+                   p.id AS pet_id, p.name, p.category, p.location, p.price, p.status AS pet_status, p.phone_number, p.image
+            FROM orders o
+            JOIN pets p ON o.pet_id = p.id
+            WHERE o.buyer_id = %s
+            ORDER BY o.time DESC
+        """, (user_id,))
+        orders = cursor.fetchall()
+
+        for order in orders:
+            order['image_urls'] = order['image'].split(',') if order['image'] else []
+
+    except Exception as e:
+        flash(f"Error fetching orders: {str(e)}", "error")
+        orders = []
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template("orders.html", orders=orders)
 
 
 

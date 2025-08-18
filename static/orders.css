@@ -154,35 +154,3 @@
 .close:hover {
   color: #bbb;
 }
-
-.wishlist-btn {
-  display: inline-block;
-  padding: 8px 12px;
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 5px;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
-
-.wishlist-btn:hover {
-  background-color: #e43f3f;
-}
-
-.buy-btn {
-    background-color: #28a745;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 5px;
-    font-size: 0.9rem;
-}
-
-.buy-btn:hover {
-    background-color: #218838;
-}

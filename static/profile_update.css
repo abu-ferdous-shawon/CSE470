@@ -1,0 +1,61 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url("https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+
+.profile-update-wrapper {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.profile-update-wrapper h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.profile-update-wrapper label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.profile-update-wrapper input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.profile-preview {
+    display: block;
+    margin: 10px 0;
+    max-width: 150px;
+    border-radius: 8px;
+}
+
+.profile-update-wrapper button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.profile-update-wrapper button:hover {
+    background-color: #45a049;
+}

@@ -13,13 +13,18 @@
         <p class="navbar-brand">PetHouse</p>
       </div>
       <div class="navbar-right">
-        <a href="/dashboard/seller/profile">Profile</a>
+        {% if session['role'] == 'buyer' %} 
+        <a href="{{ url_for('orders') }}">Purchase History</a>
+        <a href=" {{ url_for('show_wishlist') }}">Wishlist</a>
+        {% endif %}
+        <a href="{{ url_for('profile_update') }}">Profile</a>
         <a href="{% if session['role'] == 'seller' %}
              {{ url_for('seller_dashboard') }}
          {% elif session['role'] == 'buyer' %}
              {{ url_for('buyer_dashboard') }} {% endif %}">Dashboard</a>
         <a href="{{ url_for('view_appointments') }}">Appointments</a>
         <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+        
       </div>
     </div>
   </nav>
@@ -37,7 +42,7 @@
 
           <form action="{{ url_for('appoint_doctor') }}" method="post">
             <input type="hidden" name="vet_id" value="{{ vet.vet_info_id }}">
-            <button type="submit">Appoint Doctor</button>
+            <button type="submit" class="apt-btn">Appoint Doctor</button>
           </form>
         </div>
       {% else %}

@@ -36,3 +36,18 @@ body {
 .vet-card h3 {
   margin-top: 0;
 }
+
+.apt-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 5px;
+    font-size: 0.9rem;
+}
+
+.apt-btn:hover {
+    background-color: #218838;
+}

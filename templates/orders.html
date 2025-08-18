@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Orders - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='orders.css') }}">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <p class="navbar-brand">PetHouse</p>
+      </div>
+      <div class="navbar-right">
+        <a href="{{ url_for('show_wishlist') }}">Wishlist</a>
+        <a href="{{ url_for('buyer_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('profile_update') }}">Profile</a>
+        <a href="{{ url_for('available_vets') }}">Vet</a>
+        <a href="{{ url_for('view_appointments') }}">Appointments</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="dashboard-wrapper">
+    <div class="dashboard-content">
+      <h2>My Orders</h2>
+      <div class="pet-list">
+        {% if orders %}
+          {% for order in orders %}
+            <div class="pet-card">
+              <div class="pet-images">
+                {% for img_url in order.image_urls %}
+                  <img src="{{ img_url }}" alt="{{ order.name }}" onerror="this.onerror=null; this.src='/static/default_pet.png';" />
+                {% endfor %}
+              </div>
+              <h3>{{ order.name }}</h3>
+              <p>Category: {{ order.category }}</p>
+              <p>Location: {{ order.location }}</p>
+              <p>Price: ৳{{ order.price }}</p>
+              <p>Pet Status: {{ order.pet_status }}</p>
+              <p>Order Status: {{ order.order_status }}</p>
+              <p>Contact: {{ order.phone_number }}</p>
+              <p>Purchased at: {{ order.time }}</p>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No orders found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url("https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+
+.dashboard-wrapper {
+  max-width: 1100px;
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  border-radius: 10px; 
+}
+
+.pet-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.pet-table th,
+.pet-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.pet-table th {
+  background-color: #f2f2f2;
+}
+
+.pet-table img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+}
+
+.pending {
+  color: orange;
+  font-weight: bold;
+}
+
+.approve-btn {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.approve-btn:hover {
+  background-color: darkgreen;
+}

@@ -14,7 +14,11 @@
       <p class="navbar-brand">PetHouse</p>
     </div>
     <div class="navbar-right">
-      <a href="/dashboard/seller/profile">Profile</a>
+      {% if session['role'] == 'buyer' %} 
+      <a href="{{ url_for('orders') }}">Purchase History</a>
+      <a href=" {{ url_for('show_wishlist') }}">Wishlist</a>
+      {% endif %}
+      <a href="{{ url_for('profile_update') }}">Profile</a>
       <a href="{{ url_for('available_vets') }}">Vet</a>
       <a href="{{ url_for('seller_dashboard') if session['role'] == 'seller' else url_for('buyer_dashboard') }}">Dashboard</a>
       <a href="{{ url_for('logout') }}">Logout</a>

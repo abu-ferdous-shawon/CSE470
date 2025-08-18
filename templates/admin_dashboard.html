@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <p class="navbar-brand">PetHouse Admin</p>
+    </div>
+    <div class="navbar-right">
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard-wrapper">
+  <h2>Pending Pet Approvals</h2>
+
+  {% if pets %}
+  <table class="pet-table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>category</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Price</th>
+        <th>is_approved</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pet in pets %}
+      <tr>
+        <td><img src="{{ url_for('static', filename='pet_images/' + pet.image) }}" alt="{{ pet.name }}"></td>
+        <td>{{ pet.name }}</td>
+        <td>{{ pet.category }}</td>
+        <td>{{ pet.location }}</td>
+        <td>{{ pet.status }}</td>
+        <td>${{ pet.price }}</td>
+        <td class="pending">{{ pet.is_approved }}</td>
+        <td>
+          <form action="{{ url_for('approve_pet', pet_id=pet.id) }}" method="POST">
+            <button type="submit" class="approve-btn">Approve</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p>No pending pets for approval.</p>
+  {% endif %}
+</div>
+
+</body>
+</html>

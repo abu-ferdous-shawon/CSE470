@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import request, jsonify
 import os
 from werkzeug.utils import secure_filename
 import pymysql.cursors
@@ -136,13 +137,13 @@ def logout():
 
 @app.route('/dashboard/buyer')
 def buyer_dashboard():
+    buyer_id=session["user_id"]
     conn = get_db_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT id, name, category, location, price, status, phone_number, image FROM pets WHERE is_approved = 'approved' AND status != 'sold'")
+    cursor.execute("SELECT id,user_id, name, category, location, price, status, phone_number, image FROM pets WHERE is_approved = 'approved' AND status != 'sold'")
     pets_data = cursor.fetchall()
     cursor.close()
     conn.close()
-
     pets = []
     for pet in pets_data:
         images_str = pet['image'] or ""
@@ -151,7 +152,7 @@ def buyer_dashboard():
         pet['phone'] = pet['phone_number']
         pets.append(pet)
 
-    return render_template('buyer_dashboard.html', pets=pets)
+    return render_template('buyer_dashboard.html', pets=pets, buyer_id=buyer_id)
 
 
 
@@ -585,6 +586,149 @@ def orders():
         conn.close()
 
     return render_template("orders.html", orders=orders)
+
+
+@app.route("/add_review/<int:order_id>", methods=["POST"])
+def add_review(order_id):
+    if 'user_id' not in session:
+        flash("Please log in to leave a review.", "error")
+        return redirect(url_for("login"))
+    buyer_id = session['user_id']
+    rating = request.form.get("rating")
+    comment = request.form.get("comment")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Get seller_id from order
+        cursor.execute("""
+            SELECT p.user_id 
+            FROM orders o
+            JOIN pets p ON o.pet_id = p.id
+            WHERE o.id = %s
+        """, (order_id,))
+        result = cursor.fetchone()
+
+        if not result:
+            print("Order not found.", "error")
+            return redirect(url_for("orders"))
+
+        seller_id = result["user_id"]
+    
+        cursor.execute("""
+            INSERT INTO reviews (seller_id, buyer_id, rating, comment)
+            VALUES (%s, %s, %s, %s)
+        """, (seller_id, buyer_id, rating, comment))
+
+        conn.commit()
+        flash("Review submitted successfully!", "success")
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error submitting review: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("orders"))
+
+
+@app.route("/view_reviews")
+def view_reviews():
+    if 'user_id' not in session:
+        flash("Please log in to leave a review.", "error")
+        return redirect(url_for("login"))
+    seller_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    query = """
+        SELECT u.name, r.rating, r.comment FROM reviews r JOIN users u ON r.buyer_id = u.id WHERE r.seller_id = %s
+    """
+    cursor.execute(query, (seller_id,))
+    reviews = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("view_reviews.html", reviews=reviews)
+
+
+@app.route("/send_message", methods=["POST"])
+def send_message():
+    data = request.json
+
+    sender_id = data.get("sender_id") or session.get("user_id")
+    receiver_id = data.get("receiver_id")
+    pet_id = data.get("pet_id")
+    message = data.get("message")
+
+    if not sender_id or not receiver_id or not pet_id:
+        return jsonify({"error": "Missing fields"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO messages (sender_id, reciever_id, pet_id, text, timestamp)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (int(sender_id), int(receiver_id), int(pet_id), message, datetime.now())
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/get_messages/<int:buyer_id>/<int:seller_id>/<int:pet_id>")
+def get_messages(buyer_id, seller_id,pet_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute(
+        """
+        SELECT * FROM messages 
+        WHERE pet_id = %s
+          AND (
+            (sender_id = %s AND reciever_id = %s)
+            OR (sender_id = %s AND reciever_id = %s)
+          )
+        ORDER BY timestamp ASC
+        """,
+        (pet_id, buyer_id, seller_id, seller_id, buyer_id)
+    )
+    messages = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(messages)
+
+@app.route("/seller_messages")
+def seller_messages():
+    seller_id = session.get("user_id")
+    if not seller_id:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    # Get distinct chats for this seller
+    cursor.execute("""
+        SELECT m.sender_id AS buyer_id, m.pet_id,
+               u.name AS buyer_name, p.name AS pet_name
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id
+        JOIN pets p ON m.pet_id = p.id
+        WHERE m.reciever_id = %s
+        GROUP BY m.sender_id, m.pet_id
+        ORDER BY MAX(m.timestamp) DESC
+    """, (seller_id,))
+    chats = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template("seller_messages.html", chats=chats, seller_id=seller_id)
 
 
 

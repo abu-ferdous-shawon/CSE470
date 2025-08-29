@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Reviews - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='view_reviews.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <p class="navbar-brand">PetHouse</p>
+      </div>
+      <div class="navbar-right">
+        <a href="{% if session['role'] == 'seller' %}
+             {{ url_for('seller_dashboard') }}
+         {% elif session['role'] == 'buyer' %}
+             {{ url_for('buyer_dashboard') }} {% endif %}">Dashboard</a>
+        <a href="{{ url_for('profile_update') }}">Profile</a>
+        <a href="{{ url_for('available_vets') }}">Vet</a>
+        <a href="{{ url_for('view_appointments') }}">Appointments</a>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="dashboard-wrapper">
+    <div class="dashboard-content">
+      <h2 class="reviews-title">Customer Reviews</h2>
+
+      {% if reviews %}
+        <div class="reviews-list">
+          {% for review in reviews %}
+            <div class="review-card">
+              <div class="review-header">
+                <h3>Review by: {{ review.name }}</h3>
+                <span class="rating">⭐ {{ review.rating }}/5</span>
+              </div>
+              <p class="review-comment">"{{ review.comment }}"</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No reviews available yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</body>
+</html>

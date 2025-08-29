@@ -16,7 +16,10 @@
       </div>
       <div class="navbar-right">
         <a href="{{ url_for('view_reviews') }}">Reviews</a>
-        <a href="{{ url_for('seller_messages') }}">Messages</a>
+        <a href="{% if session['role'] == 'seller' %}
+             {{ url_for('seller_dashboard') }}
+         {% elif session['role'] == 'buyer' %}
+             {{ url_for('buyer_dashboard') }} {% endif %}">Dashboard</a>
         <a href="{{ url_for('profile_update') }}">Profile</a>
         <a href="{{ url_for('available_vets') }}">Vet</a>
         <a href="{{ url_for('view_appointments') }}">Appointments</a>

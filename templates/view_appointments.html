@@ -20,6 +20,7 @@
       {% endif %}
       {% if session['role'] == 'seller' %}
         <a href="{{ url_for('view_reviews') }}">Reviews</a>
+        <a href="{{ url_for('seller_messages') }}">Messages</a>
       {% endif %}
       <a href="{{ url_for('profile_update') }}">Profile</a>
       <a href="{{ url_for('available_vets') }}">Vet</a>

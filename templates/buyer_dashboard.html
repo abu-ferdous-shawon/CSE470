@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='buyer_dashboard.css') }}">
 </head>
-<body data-current-user="{{ session.get('user_id', 0) }}">
+<body>
 
   <!-- Navbar -->
   <nav class="navbar">
@@ -25,7 +25,12 @@
     </div>
   </nav>
 
+  <div id="imageModal" class="image-modal">
+    <span class="close" onclick="closeModal()">✖</span>
+    <img id="modalImage" src="" alt="Full size">
+  </div>
 
+  <!-- Dashboard -->
   <div class="dashboard-wrapper">
     <div class="dashboard-content">
       <h2>Search for your desired pets</h2>
@@ -44,9 +49,7 @@
           <div class="pet-card">
             <div class="pet-images">
               {% for img_url in pet.image_urls %}
-
                 <img src="{{ img_url }}" alt="{{ pet.name }}" onerror="this.onerror=null; this.src='/static/default_pet.png';" />
-
               {% endfor %}
             </div>
             <h3>{{ pet.name }}</h3>
@@ -60,15 +63,26 @@
               <button type="submit" class="buy-btn">Buy Now</button>
             </form>
 
-
             <!-- Live Chat Button -->
             <button class="chat-btn" onclick="toggleChat('{{ pet.id }}', '{{ pet.user_id }}', '{{ loop.index0 }}')">💬 Live Chat</button>
-
 
             <form method="POST" action="{{ url_for('add_to_wishlist') }}">
               <input type="hidden" name="pet_id" value="{{ pet.id }}">
               <button type="submit" class="wishlist-btn">Add to Wishlist</button>
             </form>
+          </div>
+
+          <!-- Floating Chat Box for each pet -->
+          <div id="chatBox-{{ pet.id }}" class="chat-box" data-index="{{ loop.index0 }}">
+            <div class="chat-header">
+              <span>Chat with {{ pet.name }}</span>
+              <button onclick="closeChat('{{ pet.id }}')" class="close-chat">✖</button>
+            </div>
+            <div class="chat-messages" id="chatMessages-{{ pet.id }}"></div>
+            <div class="chat-input">
+              <input type="text" id="chatMessageInput-{{ pet.id }}" placeholder="Type your message..." />
+              <button onclick="sendMessage('{{ pet.id }}', '{{ pet.user_id }}')">Send</button>
+            </div>
           </div>
         {% else %}
           <p>No pets available right now.</p>
@@ -158,6 +172,43 @@
       localStorage.removeItem("user");
       window.location.href = "/login";
     }
+
+  function filterPets() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const petCards = document.querySelectorAll(".pet-card");
+
+    petCards.forEach(card => {
+      const name = card.querySelector("h3").innerText.toLowerCase();
+      const category = card.querySelector("p:nth-of-type(1)").innerText.toLowerCase(); // Category
+      const location = card.querySelector("p:nth-of-type(2)").innerText.toLowerCase(); // Location
+
+      if (name.includes(input) || category.includes(input) || location.includes(input)) {
+        card.style.display = "block";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+    document.querySelectorAll(".pet-images img").forEach(img => {
+      img.addEventListener("click", function () {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        modal.style.display = "flex";
+        modalImg.src = this.src; // use clicked image src
+      });
+    });
+
+    // Close modal
+    function closeModal() {
+      document.getElementById("imageModal").style.display = "none";
+    }
+
+    // Also close when clicking outside image
+    document.getElementById("imageModal").addEventListener("click", function (e) {
+      if (e.target === this) closeModal();
+    });
+
   </script>
 </body>
 </html>

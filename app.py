@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session,jsonify
 import os
 from werkzeug.utils import secure_filename
 import pymysql.cursors
@@ -585,6 +585,51 @@ def orders():
         conn.close()
 
     return render_template("orders.html", orders=orders)
+
+
+
+@app.route("/get_messages/<int:receiver_id>")
+def get_messages(receiver_id):
+    if "user_id" not in session:
+        return jsonify([])
+    user_id = session["user_id"]
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT * FROM messages
+        WHERE (sender_id = %s AND receiver_id = %s)
+           OR (sender_id = %s AND receiver_id = %s)
+        ORDER BY timestamp ASC
+    """, (user_id, receiver_id, receiver_id, user_id))
+
+    messages = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(messages)
+
+
+@app.route("/send_message", methods=["POST"])
+def send_message():
+    if "user_id" not in session:
+        return jsonify({"error": "Not logged in"}), 403
+
+    data = request.get_json()
+    sender_id = session["user_id"]
+    receiver_id = data["receiver_id"]
+    message = data["message"]
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO messages (sender_id, receiver_id, message, timestamp)
+        VALUES (%s, %s, %s, NOW())
+    """, (sender_id, receiver_id, message))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({"success": True})
 
 
 

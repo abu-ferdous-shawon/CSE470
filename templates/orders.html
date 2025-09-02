@@ -44,7 +44,24 @@
               <p>Order Status: {{ order.order_status }}</p>
               <p>Contact: {{ order.phone_number }}</p>
               <p>Purchased at: {{ order.time }}</p>
+
+              <button class="review-btn" onclick="toggleReviewForm('{{ order.order_id }}')">Review</button>
+              <form id="review-form-{{ order.order_id }}" 
+                    class="review-form" 
+                    method="POST" 
+                    action="{{ url_for('add_review', order_id=order.order_id) }}" 
+                    style="display:none;">
+
+                <label for="rating">Rating (1-5):</label>
+                <input type="number" name="rating" min="1" max="5" required>
+
+                <label for="comment">Comment:</label>
+                <textarea name="comment" rows="2" required></textarea>
+
+                <button type="submit">Submit Review</button>
+              </form>
             </div>
+
           {% endfor %}
         {% else %}
           <p>No orders found.</p>
@@ -52,6 +69,14 @@
       </div>
     </div>
   </div>
+<script>
+  function toggleReviewForm(orderId) {
+    const form = document.getElementById(`review-form-${orderId}`);
+    if (form) {
+      form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+  }
+</script>
 
 </body>
 </html>

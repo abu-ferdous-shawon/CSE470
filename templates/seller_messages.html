@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seller Messages - PetHouse</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='seller_messages.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-left">
+        <p class="navbar-brand">PetHouse</p>
+      </div>
+      <div class="navbar-right">
+        <a href="{{ url_for('view_reviews') }}">Reviews</a>
+        <a href="{% if session['role'] == 'seller' %}
+             {{ url_for('seller_dashboard') }}
+         {% elif session['role'] == 'buyer' %}
+             {{ url_for('buyer_dashboard') }} {% endif %}">Dashboard</a>
+        <a href="{{ url_for('profile_update') }}">Profile</a>
+        <a href="{{ url_for('available_vets') }}">Vet</a>
+        <a href="{{ url_for('view_appointments') }}">Appointments</a>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Messages + Chat -->
+  <div class="dashboard-wrapper">
+    <!-- Sidebar: list of buyers/pets -->
+    <ul class="chat-list">
+      {% for chat in chats %}
+        <li onclick="openChat({{ chat.buyer_id }}, {{ chat.pet_id }}, '{{ chat.buyer_name }}', '{{ chat.pet_name }}')">
+          <b>{{ chat.buyer_name }}</b><br>
+          <small>Regarding: {{ chat.pet_name }}</small>
+        </li>
+      {% else %}
+        <li>No messages yet.</li>
+      {% endfor %}
+    </ul>
+
+    <!-- Chat area -->
+    <div class="chat-area">
+      <div class="chat-header" id="chatHeader">Select a chat to start</div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input">
+        <input type="text" id="chatMessageInput" placeholder="Type your message..." disabled />
+        <button type="button" onclick="sendMessage()" id="sendBtn" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const sellerId = {{ seller_id }};
+  let currentBuyer = null;
+  let currentPet = null;
+  let chatInterval = null;
+
+  function openChat(buyerId, petId, buyerName, petName) {
+    console.log("Opening chat:", buyerId, petId, buyerName, petName);
+    currentBuyer = buyerId;
+    currentPet = petId;
+    document.getElementById("chatHeader").innerText = "Chat with " + buyerName + " (about " + petName + ")";
+    document.getElementById("chatMessageInput").disabled = false;
+    document.getElementById("sendBtn").disabled = false;
+
+    if (chatInterval) clearInterval(chatInterval);
+    loadMessages();
+    chatInterval = setInterval(loadMessages, 2000);
+  }
+
+  function loadMessages() {
+    if (!currentBuyer || !currentPet) return;
+    fetch(`/get_messages/${currentBuyer}/${sellerId}/${currentPet}`)
+      .then(res => res.json())
+      .then(messages => {
+        const container = document.getElementById("chatMessages");
+        container.innerHTML = "";
+        messages.forEach(msg => {
+          const div = document.createElement("div");
+          div.classList.add("chat-message", Number(msg.sender_id) === sellerId ? "seller" : "buyer");
+          div.innerText = msg.text;
+          container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+      });
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("chatMessageInput");
+    const message = input.value.trim();
+    if (!message) return;
+    console.log("Sending message:", {
+    sender_id: sellerId,
+    receiver_id: currentBuyer,
+    pet_id: currentPet,
+    message
+    });
+
+    fetch("/send_message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sender_id: sellerId, receiver_id: currentBuyer, pet_id: currentPet, message })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        console.error("Server error:", data.error);
+        return;
+      }
+      input.value = "";
+      loadMessages();
+    })
+    .catch(err => console.error("Fetch failed:", err));
+  }
+</script>
+
+</body>
+</html>

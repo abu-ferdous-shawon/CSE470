@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url("https://cdn.pixabay.com/photo/2018/10/01/09/21/pets-3715733_960_720.jpg") no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+
+/* Dashboard Layout */
+.dashboard-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 100px; 
+  padding-bottom: 60px;
+}
+
+.dashboard-content {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Reviews */
+.reviews-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #222;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.rating {
+  font-weight: bold;
+  color: #f39c12;
+}
+
+.review-comment {
+  margin: 10px 0;
+  font-style: italic;
+  color: #444;
+}
+
+.review-meta {
+  font-size: 0.8rem;
+  color: #777;
+}

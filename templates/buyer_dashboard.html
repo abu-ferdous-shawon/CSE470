@@ -8,6 +8,7 @@
 </head>
 <body data-current-user="{{ session.get('user_id', 0) }}">
 
+  <!-- Navbar -->
   <nav class="navbar">
     <div class="navbar-content">
       <div class="navbar-left">
@@ -23,6 +24,7 @@
       </div>
     </div>
   </nav>
+
 
   <div class="dashboard-wrapper">
     <div class="dashboard-content">
@@ -42,8 +44,9 @@
           <div class="pet-card">
             <div class="pet-images">
               {% for img_url in pet.image_urls %}
-                <img src="{{ img_url }}" alt="{{ pet.name }}"
-                     onerror="this.onerror=null; this.src='/static/default_pet.png';" />
+
+                <img src="{{ img_url }}" alt="{{ pet.name }}" onerror="this.onerror=null; this.src='/static/default_pet.png';" />
+
               {% endfor %}
             </div>
             <h3>{{ pet.name }}</h3>
@@ -57,8 +60,10 @@
               <button type="submit" class="buy-btn">Buy Now</button>
             </form>
 
-            <!-- Live Chat button carries seller id -->
-            <button class="chat-btn" data-seller-id="{{ pet.seller_id }}">💬 Live Chat</button>
+
+            <!-- Live Chat Button -->
+            <button class="chat-btn" onclick="toggleChat('{{ pet.id }}', '{{ pet.user_id }}', '{{ loop.index0 }}')">💬 Live Chat</button>
+
 
             <form method="POST" action="{{ url_for('add_to_wishlist') }}">
               <input type="hidden" name="pet_id" value="{{ pet.id }}">
@@ -72,118 +77,86 @@
     </div>
   </div>
 
-  <!-- Image modal -->
-  <div id="imgModal" class="modal">
-    <span class="close">&times;</span>
-    <img class="modal-content" id="modalImg" />
-    <div id="caption"></div>
-  </div>
-
-  <!-- Chat Box -->
-  <div id="chatBox" class="chat-box" style="display: none;">
-    <div class="chat-header">
-      <span>Live Chat</span>
-      <button type="button" onclick="closeChat()">✖</button>
-    </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Type a message..." />
-      <button type="button" onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
+  <!-- Scripts -->
   <script>
-    function logout() {
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+    const buyerId = {{ buyer_id }};
+    let chatIntervals = {};
+
+    function toggleChat(petId, sellerId, index) {
+      const box = document.getElementById(`chatBox-${petId}`);
+      if (box.style.display === "none") {
+        box.style.display = "flex";
+        loadMessages(petId, sellerId);
+        chatIntervals[petId] = setInterval(() => loadMessages(petId, sellerId), 2000);
+      } else {
+        closeChat(petId);
+      }
     }
 
-    function filterPets() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const petCards = document.querySelectorAll(".pet-card");
-      petCards.forEach(card => {
-        const name = card.querySelector("h3").textContent.toLowerCase();
-        const category = card.querySelector("p:nth-of-type(1)").textContent.toLowerCase();
-        const location = card.querySelector("p:nth-of-type(2)").textContent.toLowerCase();
-        card.style.display = (name.includes(query) || category.includes(query) || location.includes(query)) ? "" : "none";
-      });
+    function closeChat(petId) {
+      document.getElementById(`chatBox-${petId}`).style.display = "none";
+      if (chatIntervals[petId]) {
+        clearInterval(chatIntervals[petId]);
+        delete chatIntervals[petId];
+      }
     }
 
-    // image modal
-    (function initModal() {
-      const modal = document.getElementById("imgModal");
-      const modalImg = document.getElementById("modalImg");
-      const captionText = document.getElementById("caption");
-      const closeBtn = document.getElementsByClassName("close")[0];
-
-      document.querySelectorAll(".pet-images img").forEach(img => {
-        img.addEventListener("click", () => {
-          modal.style.display = "block";
-          modalImg.src = img.src;
-          captionText.innerText = img.alt || "";
-        });
-      });
-
-      closeBtn.onclick = () => modal.style.display = "none";
-      modal.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
-    })();
-
-    // ===== Chat =====
-    let currentChatSeller = null;
-
-    document.querySelectorAll(".chat-btn").forEach(btn => {
-      btn.addEventListener("click", function() {
-        currentChatSeller = this.dataset.sellerId;
-        document.getElementById("chatBox").style.display = "flex";
-        loadMessages(currentChatSeller);
-      });
-    });
-
-    function closeChat() {
-      document.getElementById("chatBox").style.display = "none";
-      currentChatSeller = null;
-    }
-
-    function loadMessages(sellerId) {
-      fetch(`/get_messages/${sellerId}`)
-        .then(res => res.json())
-        .then(data => {
-          const chatBox = document.getElementById("chatMessages");
-          chatBox.innerHTML = "";
-          const currentUserId = Number(document.body.dataset.currentUser || 0);
-
-          data.forEach(msg => {
-            const div = document.createElement("div");
-            div.classList.add("chat-message");
-            div.classList.add(Number(msg.sender_id) === currentUserId ? "me" : "them");
-            div.textContent = msg.message;
-            chatBox.appendChild(div);
-          });
-          chatBox.scrollTop = chatBox.scrollHeight;
-        })
-        .catch(err => console.error("loadMessages error:", err));
-    }
-
-    function sendMessage() {
-      const input = document.getElementById("chatInput");
+    function sendMessage(petId, sellerId) {
+      const input = document.getElementById(`chatMessageInput-${petId}`);
       const message = input.value.trim();
-      if (!message || !currentChatSeller) return;
+      if (!message) return;
+
+      const container = document.getElementById(`chatMessages-${petId}`);
+      const div = document.createElement("div");
+      div.classList.add("chat-message", "buyer");
+      div.innerText = message;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
 
       fetch("/send_message", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ receiver_id: currentChatSeller, message })
-      })
-        .then(res => res.json())
-        .then(resp => {
-          if (resp.success) {
-            input.value = "";
-            loadMessages(currentChatSeller);
-          } else {
-            alert(resp.error || "Failed to send");
-          }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender_id: buyerId,            // ✅ correct key
+          receiver_id: parseInt(sellerId), // ✅ correct key
+          pet_id: parseInt(petId),
+          message
         })
-        .catch(err => console.error("sendMessage error:", err));
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          console.error("Server error:", data.error);
+          return;
+        }
+        input.value = "";
+        loadMessages(petId, sellerId);
+      })
+      .catch(err => console.error("Fetch failed:", err));
+    }
+
+    function loadMessages(petId, sellerId) {
+      fetch(`/get_messages/${buyerId}/${sellerId}/${petId}`)  // 👈 include petId
+        .then(res => res.json())
+        .then(messages => {
+          const container = document.getElementById(`chatMessages-${petId}`);
+          container.innerHTML = "";
+          messages.forEach(msg => {
+            const div = document.createElement("div");
+            div.classList.add(
+              "chat-message",
+              Number(msg.sender_id) === buyerId ? "buyer" : "seller"
+            );
+            div.innerText = msg.text;
+            container.appendChild(div);
+          });
+          container.scrollTop = container.scrollHeight;
+        });
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
   </script>
 </body>

@@ -40,58 +40,25 @@
   gap: 16px; 
 }
 
-
 .pet-card {
-  background: #888eaf;
-  padding: 10px; 
-  border-radius: 6px;
-  color: white;
-  font-size: 0.9rem; 
+  background: rgba(255, 255, 255, 0.15); /* glass effect */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 6px; 
+  gap: 8px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
-.pet-card p {
-  margin: 2px 0;
-  font-size: 0.85rem;
-}
-
 
 .pet-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-}
-
-.pet-card button {
-  margin-top: 6px;
-  padding: 4px 8px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 0.8rem; 
-}
-
-.pet-card button:first-child {
-  background-color: #3498db;
-  color: white;
-  margin-right: 10px;
-}
-
-.pet-card button:last-child {
-  background-color: #27ae60;
-  color: white;
-}
-
-.chat-btn {
-  background: #f39c12;
-  margin-top: 8px;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 6px 12px;
-  cursor: pointer;
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
 .pet-images {
@@ -103,26 +70,86 @@
 
 .pet-card img {
   width: 100%;
-  height: 120px; 
+  height: 150px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 4px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
 }
 
-
-
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 9999; 
-  padding-top: 60px; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgba(0,0,0,0.8); 
+.pet-card img:hover {
+  transform: scale(1.05);
 }
+
+.pet-card h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 4px 0;
+  color: #000000;
+}
+
+.pet-card p {
+  margin: 2px 0;
+  font-size: 0.85rem;
+  color: #030303;
+}
+
+/* Price badge */
+.pet-card .price {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  color: #fff;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+/* Status tags */
+.status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status.selling {
+  background: #27ae60;
+  color: #fff;
+}
+
+.status.adoption {
+  background: #2980b9;
+  color: #fff;
+}
+
+.status.pending {
+  background: #f39c12;
+  color: #fff;
+}
+
+.status.completed {
+  background: #2ecc71;
+  color: #fff;
+}
+
+.review-btn {
+  margin-top: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, #4CAF50, #2ecc71);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.review-btn:hover {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
 
 
 .modal-content {
@@ -153,4 +180,61 @@
 }
 .close:hover {
   color: #bbb;
+}
+
+.review-form {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fafafa; /* soft white background */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-form label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.review-form input[type="number"],
+.review-form textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.review-form input[type="number"]:focus,
+.review-form textarea:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+  outline: none;
+}
+
+.review-form textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.review-form button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(135deg, #4CAF50, #2ecc71);
+  color: white;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.review-form button:hover {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  transform: translateY(-2px);
 }
